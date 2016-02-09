@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Alphabettle demo</title>
+	<style> body { margin: 0; background: #B4D9E7; } </style>
+	<script src="libs/phaser.js"></script>
+	<script src="Boot.js"></script>
+	<script src="Preloader.js"></script>
+	<script src="MainMenu.js"></script>
+	<script src="Game.js"></script>
+</head>
+<body>
+<script>
+(function() {
+	// initialize the framework
+	var game = new Phaser.Game(1368, 864, Phaser.AUTO, 'game');
+	// add game states
+	game.state.add('Boot', Alphab.Boot);
+	game.state.add('Preloader', Alphab.Preloader);
+	game.state.add('MainMenu', Alphab.MainMenu);
+	game.state.add('Game', Alphab.Game);
+	// start the Boot state
+	game.state.start('Boot');
+})();
+</script>
+</body>
+</html>
