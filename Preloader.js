@@ -12,7 +12,7 @@ Alphab.Preloader.prototype = {
 		// load images
 		this.load.image('background', 'img/Backrocket.png');
 		// load spritesheets
-		this.load.spritesheet('alphabets', 'img/ATOZsmallf.png', 50, 50);
+		this.load.spritesheet('balls', 'img/ATOZsmallf.png', 50, 50);
 		this.load.spritesheet('button-start', 'img/button-start.png', 401, 143);
 	},
 	create: function(){
