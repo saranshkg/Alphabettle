@@ -12,8 +12,6 @@ Alphab.Boot.prototype = {
 		this.scale.pageAlignHorizontally = true;
 		this.scale.pageAlignVertically = true;
 		this.scale.setScreenSize(true);
-        //physics system for movement
-        this.game.physics.startSystem(Phaser.Physics.ARCADE);
 		// start the Preloader state
 		this.state.start('Preloader');
 	}

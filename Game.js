@@ -5,8 +5,8 @@ Alphab.Game = function(game){
     mov_ball = null;
     mov_ballGroup = null;
     ammo_ball = null;
+    ammo_ball_next = null;
     ammo_ballType = 0;
-    time = 0;
     counter = 0;
     text = 0;
     path = [];
@@ -15,15 +15,16 @@ Alphab.Game = function(game){
     spacer = 30;
     overlap = [];
     k = 0;
-    //z = 0;
+    score = 0;
 };
 
 Alphab.Game.prototype = {
 	create: function() {
         this.add.sprite(0, 0, 'backgame');
         
-        this.cannon = this.game.add.sprite(Alphab.GAME_WIDTH/2, Alphab.GAME_HEIGHT/2, 'balls');
-        this.cannon.anchor.setTo(0.5, 0.5);
+        this.cannon = this.game.add.sprite(Alphab.GAME_WIDTH/2, Alphab.GAME_HEIGHT/2, 'arrow');
+        this.cannon.pivot.x = -70;
+        this.cannon.anchor.set(0.5);
         
         mov_ballGroup = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
         
@@ -32,69 +33,10 @@ Alphab.Game.prototype = {
 		mov_ball.animations.add('anim', [mov_ballType], 10, true);
 		mov_ball.animations.play('anim');
         mov_ball.anchor.set(0.5);
-        mov_ball.type = String.fromCharCode(mov_ballType + 1 + 65);
+        mov_ball.type = String.fromCharCode(mov_ballType + 65);
         mov_ballGroup.add(mov_ball);
-       // console.log(mov_ballGroup.getChildIndex(mov_ball));
         
-            new_mov_ball = this.add.sprite(-50, 150, 'balls');
-            var new_mov_ballType = Math.floor(Math.random()*26);
-            new_mov_ball.animations.add('anim', [4], 10, true);
-            new_mov_ball.animations.play('anim');
-            new_mov_ball.anchor.set(0.5);
-            new_mov_ball.type = String.fromCharCode(1 + 1 + 65);
-            mov_ballGroup.add(new_mov_ball);
-        
-            new_mov_ball = this.add.sprite(-50, 150, 'balls');
-            var new_mov_ballType = Math.floor(Math.random()*26);
-            new_mov_ball.animations.add('anim', [2], 10, true);
-            new_mov_ball.animations.play('anim');
-            new_mov_ball.anchor.set(0.5);
-            new_mov_ball.type = String.fromCharCode(1 + 1 + 65);
-            mov_ballGroup.add(new_mov_ball);
-        
-            new_mov_ball = this.add.sprite(-50, 150, 'balls');
-            var new_mov_ballType = Math.floor(Math.random()*26);
-            new_mov_ball.animations.add('anim', [4], 10, true);
-            new_mov_ball.animations.play('anim');
-            new_mov_ball.anchor.set(0.5);
-            new_mov_ball.type = String.fromCharCode(3 + 1 + 65);
-            mov_ballGroup.add(new_mov_ball);
-        
-            new_mov_ball = this.add.sprite(-50, 150, 'balls');
-            var new_mov_ballType = Math.floor(Math.random()*26);
-            new_mov_ball.animations.add('anim', [2], 10, true);
-            new_mov_ball.animations.play('anim');
-            new_mov_ball.anchor.set(0.5);
-            new_mov_ball.type = String.fromCharCode(1 + 1 + 65);
-            mov_ballGroup.add(new_mov_ball);
-        
-            new_mov_ball = this.add.sprite(-50, 150, 'balls');
-            var new_mov_ballType = Math.floor(Math.random()*26);
-            new_mov_ball.animations.add('anim', [4], 10, true);
-            new_mov_ball.animations.play('anim');
-            new_mov_ball.anchor.set(0.5);
-            new_mov_ball.type = String.fromCharCode(3 + 1 + 65);
-            mov_ballGroup.add(new_mov_ball);
-        
-            new_mov_ball = this.add.sprite(-50, 150, 'balls');
-            var new_mov_ballType = Math.floor(Math.random()*26);
-            new_mov_ball.animations.add('anim', [2], 10, true);
-            new_mov_ball.animations.play('anim');
-            new_mov_ball.anchor.set(0.5);
-            new_mov_ball.type = String.fromCharCode(1 + 1 + 65);
-            mov_ballGroup.add(new_mov_ball);
-        
-        
-            new_mov_ball = this.add.sprite(-50, 150, 'balls');
-            var new_mov_ballType = Math.floor(Math.random()*26);
-            new_mov_ball.animations.add('anim', [4], 10, true);
-            new_mov_ball.animations.play('anim');
-            new_mov_ball.anchor.set(0.5);
-            new_mov_ball.type = String.fromCharCode(3 + 1 + 65);
-            mov_ballGroup.add(new_mov_ball);
-        
-        
-        for (var i = 8; i < TOTAL_BALLS; i++){
+        for (var i = 1; i < TOTAL_BALLS; i++){
             new_mov_ball = this.add.sprite(-50, 150, 'balls');
             var new_mov_ballType = Math.floor(Math.random()*26);
             new_mov_ball.animations.add('anim', [new_mov_ballType], 10, true);
@@ -114,10 +56,40 @@ Alphab.Game.prototype = {
         ammo_ballGroup = this.game.add.group();
         ammo_ballGroup.enableBody = true;
         
-        text = this.game.add.text(1150, 20, 'Counter: 0', { font: "32px Arial", fill: "#ffffff", align: "center" });
+        ammo_ball_next = this.game.add.sprite(Alphab.GAME_WIDTH/2 - 25, Alphab.GAME_HEIGHT/2 - 25, 'balls');
+        ammo_ballType = this.weighted_random();
+        ammo_ball_next.animations.add('anim', [ammo_ballType], 10, true);
+        ammo_ball_next.animations.play('anim');    
+    
+        textCounter = this.game.add.text(1150, 20, 'Counter: 0', { font: "32px Arial", fill: "#ffffff", align: "center" });
+        textScore = this.game.add.text(50, 20, 'Score: 0', { font: "32px Arial", fill: "#ffffff", align: "center" });
         this.game.time.events.loop(1000, this.updateCounter, this);
         
-        
+    },
+
+    weighted_random: function() {
+        var fruits=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 
+                14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
+        var fruitweight=[5, 1, 1, 1, 5, 1, 1, 1, 5, 1, 1, 1, 1,
+                         1, 5, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1];
+        var totalweight=eval(fruitweight.join("+"))
+        var weighedfruits=new Array();
+        var currentfruit=0;
+     
+        while (currentfruit<fruits.length){
+            for (i=0; i<fruitweight[currentfruit]; i++)
+                weighedfruits[weighedfruits.length]=fruits[currentfruit];
+            currentfruit++;
+        }
+
+        var randomnumber=Math.floor(Math.random()*totalweight);
+        return weighedfruits[randomnumber];
+    },
+    
+    updateCounter: function() {
+        counter++;
+        textCounter.setText('Counter: ' + counter);
+        textScore.setText('Score: ' + score);
     },
     
     shootball: function() {
@@ -126,56 +98,34 @@ Alphab.Game.prototype = {
         if (this.game.time.now - this.lastballShotAt < SHOT_DELAY) 
             return;
         this.lastballShotAt = this.game.time.now;
-
-        var ammo_ball = this.game.add.sprite(Alphab.GAME_WIDTH/2, Alphab.GAME_HEIGHT/2, 'balls');
-        ammo_ballType = Math.floor(Math.random()*26);
-        ammo_ball.animations.add('anim', [0], 10, true);
-        ammo_ball.animations.play('anim');
+        
+        
+        ammo_ball = this.game.add.sprite(Alphab.GAME_WIDTH/2 - 25, Alphab.GAME_HEIGHT/2 - 25, 'balls');
+        
+        ammo_ball.animations.add('anim', [ammo_ballType], 10, true);
+        ammo_ball.animations.play('anim');      
         ammo_ball.anchor.setTo(0.5, 0.5);
-        ammo_ball.type = String.fromCharCode(0 + 65);
+        ammo_ball.type = String.fromCharCode(ammo_ballType + 65);
+        
         this.game.physics.enable(ammo_ball, Phaser.Physics.ARCADE);
         ammo_ball.checkWorldBounds = true;
         ammo_ball.outOfBoundsKill = true;
-        ammo_ball.rotation = this.cannon.rotation;
+        var rotation = this.cannon.rotation;
         ammo_ball.reset(this.cannon.x, this.cannon.y);
 
-        ammo_ball.body.velocity.x = Math.cos(ammo_ball.rotation) * BALL_SPEED;
-        ammo_ball.body.velocity.y = Math.sin(ammo_ball.rotation) * BALL_SPEED;
+        ammo_ball.body.velocity.x = Math.cos(rotation) * BALL_SPEED;
+        ammo_ball.body.velocity.y = Math.sin(rotation) * BALL_SPEED;
         ammo_ballGroup.add(ammo_ball);
+        
+        ammo_ball_next = this.game.add.sprite(Alphab.GAME_WIDTH/2 - 25, Alphab.GAME_HEIGHT/2 - 25, 'balls');
+        ammo_ballType = this.weighted_random();
+        ammo_ball_next.animations.add('anim', [ammo_ballType], 10, true);
+        ammo_ball_next.animations.play('anim'); 
+        
     },
-
-        // Takes in an array of letters and finds the longest
-    // possible word at the front of the letters
-     findWord: function(letters,j) {
-        // Clone the array for manipulation
-        var curLetters = letters.slice( 0 ), word = "";
-
-        // Make sure the word is at least 3 letters long
-        while ( curLetters.length > 2 ) {
-            // Get a word out of the existing letters
-            word = curLetters.join("");
-            //console.log(word);
-
-            // And see if it's in the dictionary
-            if ( dict[ word ] ) {
-                // If it is, return that word
-                for(i=0;i<word.length;i++){
-                    console.log("Word removed");
-                    console.log(mov_ballGroup.children[j].type);
-                    mov_ballGroup.remove(mov_ballGroup.children[j]);
-                    //mov_ballGroup.children[j].kill();
-                }
-                return word;
-            }
-
-            // Otherwise remove another letter from the end
-            curLetters.pop();
-        }
-     },
   
     collision: function(a, m) {
         ammo_ballGroup.remove(a);
-
         
         k++;
         
@@ -183,18 +133,19 @@ Alphab.Game.prototype = {
             k = 0;
             return;
         }
-        /*
-        for(j = 0; j < mov_ballGroup.children.length; j++){
-            if (mov_ballGroup.children[j] === m){
-                console.log(k, j);
-                break;
-            }
-        }
-        */
+
         j =  mov_ballGroup.getChildIndex(m);
          
         if (j == 0){
             mov_ballGroup.addChildAt(a, 1);
+            console.log("Index: " + j+1);
+            var temp = [];
+            for(l=0,i=j+1;i<=j+7;i++,l++){
+                temp[l] = mov_ballGroup.children[i].type;
+            }
+            var str = temp.join("");
+            console.log(str);
+            console.log("Word: " + this.findWord(temp,j+1));
             return;
         }
         
@@ -203,44 +154,77 @@ Alphab.Game.prototype = {
                                 
         if (dist2 < dist1){
             mov_ballGroup.addChildAt(a, j);
-            console.log("Location: " + j);
-            //console.log(mov_ballGroup.children[j].type);
-            //console.log(mov_ballGroup.children.slice(j,6));
+            console.log("Index: " + j);
             var temp = [];
-            //console.log(j);
-            for(l=0,i=j;i<=j+6;i++,l++){
+            if (j<5)
+                j_start = 0;
+            else
+                j_start = j-5;
+            for(l=0,i=j_start;i<=j+5;i++,l++){
                 temp[l] = mov_ballGroup.children[i].type;
-            //    console.log(l, temp[l]);
             }
             var str = temp.join("");
             console.log(str);
-            console.log("The output is :" + this.findWord(temp,j));
-            console.log("Length: " + mov_ballGroup.children.length);
+            console.log("Word: " + this.findWord(temp,j_start));
         }
         
         else{
             mov_ballGroup.addChildAt(a, j+1);
-            console.log("Location: " + j+1);
-            //console.log(mov_ballGroup.children[j+1].type);
-            //console.log(mov_ballGroup.children.slice(j,6));
+            console.log("Index: " + j+1);
             var temp = [];
-            //console.log(j+1);
-            for(l=0,i=j+1;i<=j+7;i++,l++){
+            if (j<4)
+                j_start = 0;
+            else
+                j_start = j-4;
+            for(l=0,i=j_start;i<=j+6;i++,l++){
                 temp[l] = mov_ballGroup.children[i].type;
-            //    console.log(l, temp[l]);
             }
             var str = temp.join("");
             console.log(str);
-           console.log("The output is: " + this.findWord(temp,j+1));
-        
+            console.log("Word: " + this.findWord(temp,j_start));
         }
-        
-    //    balls_left = mov_ballGroup.children.length;
-        
-    //    for(i=0; i<balls_left; i++)
-    //        console.log(mov_ballGroup.children[i].type);
-      
     },
+    
+     findWord: function(letters,j) {
+        // Clone the array for manipulation
+        var curLetters = letters.slice( 0 ), word = "";
+        // console.log(letters[0]);
+
+        // Make sure the word is at least 3 letters long
+        while (true) {
+            if( curLetters.length > 2){
+                // Get a word out of the existing letters
+                word = curLetters.join("");
+                //console.log(word);
+
+                // And see if it's in the dictionary
+                if ( dict[ word ] ) {
+                    // If it is, return that word
+                    for(i=0;i<word.length;i++){
+                        console.log("Word removed");
+                        score++;
+                        console.log(mov_ballGroup.children[j].type);
+                        mov_ballGroup.remove(mov_ballGroup.children[j]);
+                        //mov_ballGroup.children[j].kill();
+                    }
+                    return word;
+                }
+
+                // Otherwise remove another letter from the end
+                curLetters.pop();
+
+                }
+            else if(letters.length > 3){
+                letters.splice(0,1);
+                console.log(letters);
+                this.findWord(letters,j+1);
+            }
+            else{
+                console.log("Undefined");
+                break;
+            }
+        }
+     },
     
     checkOverlap: function(spriteA, spriteB) {
         var boundsA = spriteA.getBounds();
@@ -248,13 +232,7 @@ Alphab.Game.prototype = {
         return Phaser.Rectangle.intersects(boundsA, boundsB);
     },
     
-    updateCounter: function() {
-        counter++;
-        text.setText('Counter: ' + counter);
-    },
-    
 	update: function(){
-        
         this.cannon.rotation = this.game.physics.arcade.angleToPointer(this.cannon);
         
         if (this.game.input.activePointer.isDown) {
@@ -310,29 +288,17 @@ Alphab.Game.prototype = {
             mov_ball.body.velocity.y = -70;
         }
         
-        /*for(i=0; i < balls_left; i++){
-            if (counter > (i / 2 +  ) &&  mov_ballGroup.children[i].x < 0){
-                mov_ballGroup.children.shift();
-            }
-        }*/
-
-        //console.log(balls_left, TOTAL_BALLS, "HERE");
-        
-        //z++;
-        //console.log(z, balls_left);
-        
         part = new_path.pop();
-
         part.setTo(mov_ball.x, mov_ball.y);
-
-        new_path.unshift(part);
-
+        new_path.unshift(part);  
+        
+        balls_left = mov_ballGroup.children.length; 
+        if((balls_left - 1) > TOTAL_BALLS)
+            new_path.push(new Phaser.Point(-50, 200));
+            
         /*for(i=0; i < balls_left-1; i++){
             overlap[i] = this.checkOverlap(section[i], section[i+1]);
         }*/
-        
-        balls_left = mov_ballGroup.children.length;
-        
         for (var i = 1; i < balls_left - 1; i++){
             /*if(!overlap[i-1]){
                 section[i].x = (new_path[i * spacer]).x;
